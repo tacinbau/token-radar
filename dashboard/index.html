@@ -1,15 +1,11 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Token Radar: pre-token protocols ranked by implied value</title>
-<link rel="stylesheet" href="app.css">
-</head>
-<body>
-<a class="skip" href="#board">Skip to the board</a>
-<main id="board" tabindex="-1" aria-busy="true"></main>
-<script src="../data.js"></script>
-<script src="app.js"></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Signal — Token launch radar</title><link rel="stylesheet" href="app.css"></head>
+<body><header class="mast"><a class="brand" href="#"><span class="mark">◉</span> SIGNAL <small>RESEARCH TERMINAL</small></a><span class="sealed"><i></i> SEALED SNAPSHOT · 14 NOV 2026</span></header>
+<main><section class="intro"><div><p class="eyebrow">PRE-TOKEN INTELLIGENCE / 01</p><h1>Find the signal.<br><span>Before the launch.</span></h1><p class="lede">A launch radar for protocols that record no token.<br>Ranked by transparent, snapshot-derived implied value.</p></div><aside class="brief"><span class="eyebrow">THE RESEARCH LENS</span><p>Capital already at work.<br>Value still to be discovered.</p><div>TVL × category comps × growth × time</div><small>Values are this entry’s own claim. They are not token prices, launch predictions or make.fun valuations.</small></aside></section>
+<section id="metrics" class="metrics" aria-label="Coverage"></section>
+<div class="section-heading"><div><p class="eyebrow">THE OPPORTUNITY SET</p><h2>Launch radar <span id="result-count"></span></h2></div><button id="method-toggle" aria-expanded="false" aria-controls="method">How the value is scored <span>↗</span></button></div>
+<section id="method" class="method" hidden><h3>How the value is scored</h3><p>TVL times the category comp multiple, adjusted by 7-day growth and by days tracked with no token. This is a hypothetical token market capitalization, not an airdrop allocation.</p><div class="method-grid"><p><b>01 / Category comps</b>Median market cap ÷ TVL among token-bearing protocols with both figures positive, in the same category. Categories without comps use the global median. Category multiples are winsorized at the 90th percentile of all token-bearing market cap ÷ TVL comparables in the snapshot. Each detail shows its sample size.</p><p><b>02 / Growth</b>1 + clamped 7-day TVL change ÷ 200. Changes are capped at −50% and +100%, giving factors from 0.75× to 1.50×. Missing growth is neutral.</p><p><b>03 / Tracking age</b>1 + min(days tracked, 1,460) ÷ 1,460 × 0.25. Missing dates are neutral. Tracking age is a proxy, not a launch date or proof of token status.</p></div><p>No implied value exceeds the largest token market cap actually recorded in the snapshot. Round to whole dollars; ties favor larger TVL then slug, with a $1 downward adjustment if necessary. A launch radar ranks farmable protocols, not exchanges or wrapped assets: 144 other pre-token records are excluded by category and name rules. The 416 token-recorded protocols are used only as possible comps. Plans are category-guided research checklists, not verified campaigns; eligibility and product availability require checking.</p></section>
+<section class="workspace"><div class="board"><div class="filters"><label class="search">Search protocols<input id="search" type="search" placeholder="Name, category or chain…"></label><label>Category<select id="category"><option value="">All categories</option></select></label><label>Chain<select id="chain"><option value="">All chains</option></select></label><label>Minimum TVL<select id="minimum"><option value="0">All sizes</option><option value="10000000">$10M+</option><option value="50000000">$50M+</option><option value="100000000">$100M+</option><option value="1000000000">$1B+</option></select></label><label class="check"><input type="checkbox" id="watchlist"> Watchlist only</label><button id="reset" class="reset">Reset</button></div>
+<div class="table-top"><span id="view-label">ALL FARMABLE PROTOCOLS</span><span>Click a row to inspect →</span></div><div class="table-wrap"><table><thead><tr><th><button data-sort="rank">Rank</button></th><th>Protocol / category</th><th><button data-sort="implied_value_usd">Implied value</button></th><th><button data-sort="tvl_usd">TVL</button></th><th><button data-sort="change_7d">7d change</button></th><th><button data-sort="age_days">Age</button></th><th>Value / TVL</th></tr></thead><tbody id="rows"></tbody></table><p id="empty" hidden>No protocols match. Try a broader filter.</p></div><div class="table-footer"><span id="showing"></span><span><i class="amber-dot"></i> Watchlist = snapshot’s $50M+ selection</span></div></div>
+<aside id="detail" class="detail" aria-label="Protocol research detail"></aside></section>
+<footer><span>SIGNAL / INDEPENDENT LAUNCH RESEARCH</span><span>Frozen DefiLlama snapshot · 2026-11-14 · No live requests</span></footer></main><script src="../data.js"></script><script src="app.js"></script></body></html>
