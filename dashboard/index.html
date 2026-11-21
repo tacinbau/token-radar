@@ -1,11 +1,63 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Signal — Token launch radar</title><link rel="stylesheet" href="app.css"></head>
-<body><header class="mast"><a class="brand" href="#"><span class="mark">◉</span> SIGNAL <small>RESEARCH TERMINAL</small></a><span class="sealed"><i></i> SEALED SNAPSHOT · 14 NOV 2026</span></header>
-<main><section class="intro"><div><p class="eyebrow">PRE-TOKEN INTELLIGENCE / 01</p><h1>Find the signal.<br><span>Before the launch.</span></h1><p class="lede">A launch radar for protocols that record no token.<br>Ranked by transparent, snapshot-derived implied value.</p></div><aside class="brief"><span class="eyebrow">THE RESEARCH LENS</span><p>Capital already at work.<br>Value still to be discovered.</p><div>TVL × category comps × growth × time</div><small>Values are this entry’s own claim. They are not token prices, launch predictions or make.fun valuations.</small></aside></section>
-<section id="metrics" class="metrics" aria-label="Coverage"></section>
-<div class="section-heading"><div><p class="eyebrow">THE OPPORTUNITY SET</p><h2>Launch radar <span id="result-count"></span></h2></div><button id="method-toggle" aria-expanded="false" aria-controls="method">How the value is scored <span>↗</span></button></div>
-<section id="method" class="method" hidden><h3>How the value is scored</h3><p>TVL times the category comp multiple, adjusted by 7-day growth and by days tracked with no token. This is a hypothetical token market capitalization, not an airdrop allocation.</p><div class="method-grid"><p><b>01 / Category comps</b>Median market cap ÷ TVL among token-bearing protocols with both figures positive, in the same category. Categories without comps use the global median. Category multiples are winsorized at the 90th percentile of all token-bearing market cap ÷ TVL comparables in the snapshot. Each detail shows its sample size.</p><p><b>02 / Growth</b>1 + clamped 7-day TVL change ÷ 200. Changes are capped at −50% and +100%, giving factors from 0.75× to 1.50×. Missing growth is neutral.</p><p><b>03 / Tracking age</b>1 + min(days tracked, 1,460) ÷ 1,460 × 0.25. Missing dates are neutral. Tracking age is a proxy, not a launch date or proof of token status.</p></div><p>No implied value exceeds the largest token market cap actually recorded in the snapshot. Round to whole dollars; ties favor larger TVL then slug, with a $1 downward adjustment if necessary. A launch radar ranks farmable protocols, not exchanges or wrapped assets: 144 other pre-token records are excluded by category and name rules. The 416 token-recorded protocols are used only as possible comps. Plans are category-guided research checklists, not verified campaigns; eligibility and product availability require checking.</p></section>
-<section class="workspace"><div class="board"><div class="filters"><label class="search">Search protocols<input id="search" type="search" placeholder="Name, category or chain…"></label><label>Category<select id="category"><option value="">All categories</option></select></label><label>Chain<select id="chain"><option value="">All chains</option></select></label><label>Minimum TVL<select id="minimum"><option value="0">All sizes</option><option value="10000000">$10M+</option><option value="50000000">$50M+</option><option value="100000000">$100M+</option><option value="1000000000">$1B+</option></select></label><label class="check"><input type="checkbox" id="watchlist"> Watchlist only</label><button id="reset" class="reset">Reset</button></div>
-<div class="table-top"><span id="view-label">ALL FARMABLE PROTOCOLS</span><span>Click a row to inspect →</span></div><div class="table-wrap"><table><thead><tr><th><button data-sort="rank">Rank</button></th><th>Protocol / category</th><th><button data-sort="implied_value_usd">Implied value</button></th><th><button data-sort="tvl_usd">TVL</button></th><th><button data-sort="change_7d">7d change</button></th><th><button data-sort="age_days">Age</button></th><th>Value / TVL</th></tr></thead><tbody id="rows"></tbody></table><p id="empty" hidden>No protocols match. Try a broader filter.</p></div><div class="table-footer"><span id="showing"></span><span><i class="amber-dot"></i> Watchlist = snapshot’s $50M+ selection</span></div></div>
-<aside id="detail" class="detail" aria-label="Protocol research detail"></aside></section>
-<footer><span>SIGNAL / INDEPENDENT LAUNCH RESEARCH</span><span>Frozen DefiLlama snapshot · 2026-11-14 · No live requests</span></footer></main><script src="../data.js"></script><script src="app.js"></script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signal v3 — Token Launch Radar</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header>
+  <div>
+    <h1>SIGNAL v3 <span>Token Launch Radar</span></h1>
+    <p class="sub">Every pre-token protocol in the sealed snapshot, ranked by fitted launch value &times; launch odds. Snapshot <b id="asof">—</b> &middot; <span id="covline">—</span></p>
+  </div>
+  <div class="kpis" id="kpis"></div>
+</header>
+
+<section class="method">
+  <h2>How this radar works</h2>
+  <p><b>1. Fitted comps curve, not a fixed multiple.</b> For the <span id="m-fit-n">—</span> token-bearing protocols with a market cap, log<sub>10</sub>(market cap) is regressed on log<sub>10</sub>(TVL), plus a shrunken category offset (each category&rsquo;s mean residual, shrunk by n/(n+5), so thin categories borrow the global curve): <code id="m-fit-eq">—</code>.</p>
+  <p><b>2. Tested held out, not in sample.</b> 5-fold cross-validation: each of the 128 comps is predicted once by a curve fitted without it. Median |log<sub>10</sub> error| <b id="m-held-err">—</b>, <b id="m-held-2x">—</b> of held-out values within 2&times;, 90% interval coverage <b id="m-held-cov">—</b>.</p>
+  <p><b>3. Launch odds from the peers&rsquo; record.</b> The odds are the share of protocols this old that already record a token, smoothed toward the overall rate: <span id="m-odds">—</span>. Age unknown uses the overall rate. This is the peers&rsquo; record, not a promise a token will launch.</p>
+  <p><b>4. Costed farm verdicts.</b> Expected farmer value assumes a 10% airdrop pool split among 2,000 farmers. Farm cost is 3 gas sessions (by chain) plus $25 test capital. Verdict: <b>farm</b> when farmer value is &ge;20&times; cost, <b>thin</b> at 5&ndash;20&times;, <b>skip</b> below 5&times;. Wrapped, staked, bridged and versioned products are always skip, with the reason on the row.</p>
+  <p class="fine">Figures are this entry&rsquo;s valuation model applied to a frozen snapshot, not a launch forecast and not financial advice. Verify eligibility on the protocol&rsquo;s own pages before farming.</p>
+</section>
+
+<section class="controls">
+  <input id="q" type="search" placeholder="Search name or slug…" autocomplete="off">
+  <div class="filters" id="filters">
+    <button data-filter="farmable" class="on">Farmable</button>
+    <button data-filter="all">All pre-token</button>
+    <button data-filter="watchlist">Watchlist</button>
+    <button data-filter="skip">Skip</button>
+  </div>
+  <select id="cat" aria-label="Category"><option value="">All categories</option></select>
+  <span id="count" class="count"></span>
+</section>
+
+<main>
+  <table id="board">
+    <thead><tr>
+      <th data-sort="rank">#</th><th data-sort="name">Protocol</th><th data-sort="tvl_usd">TVL</th>
+      <th data-sort="fitted_value_usd">Fitted</th><th data-sort="launch_odds">Odds</th>
+      <th data-sort="implied_value_usd">Expected value</th><th data-sort="farmer_value_usd">Farmer $</th>
+      <th data-sort="farm_cost_usd">Cost</th><th data-sort="farm_verdict">Verdict</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <p class="empty" id="empty" hidden>No protocols match this filter.</p>
+</main>
+
+<aside id="detail" hidden>
+  <button id="close" aria-label="Close detail">&times;</button>
+  <div id="detail-body"></div>
+</aside>
+
+<footer>
+  <p>Signal v3 &middot; fitted log-log comps curve &times; empirical launch odds &middot; <span id="foot">—</span></p>
+</footer>
+<script src="../data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
