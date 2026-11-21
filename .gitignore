@@ -1,4 +1,6 @@
-# Transcript bundle and usage rows are never committed: the bundle carries the
-# build sessions, and the usage rows carry the build's token counts.
+out/
+transcripts*.tar.gz
 makefun-bundle.tar.gz
+node_modules/
+parent-session-main.jsonl
 muse-usage.jsonl
