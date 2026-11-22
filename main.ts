@@ -1,4 +1,4 @@
-// Signal v3 — the token-radar-01 entry (Node 22+, standard library only).
+// Signal v4 — the token-radar-01 entry (Node 22+, standard library only).
 //
 // Reads the sealed snapshot from /input/snapshot.json (or --input <file|dir>),
 // scores every pre-token protocol with the fitted model in lib/model.ts,
@@ -87,10 +87,17 @@ for (const name of shots) {
 writeFileSync(join(out, 'dossier.json'), buildDossier(out, { text_max_bytes: TEXT_MAX_BYTES, screenshots: SCREENSHOT_CAPS, dashboard: { max_files: 400, max_bytes: 4_194_304 } }));
 
 const fit = board.model.fit;
-const held = board.model.heldOut;
+const ev = board.model.evidence;
+const sizeTerm = ev.valueTerms.find((t) => t.term === 'size curve, in TVL')!;
+const flatTerm = ev.valueTerms.find((t) => t.term === 'flat median multiple')!;
+const ageTerm = ev.oddsTerms.find((t) => t.term === '+ age, years listed')!;
+const baseTerm = ev.oddsTerms.find((t) => t.term === 'base rate of peers')!;
+const a = board.coverage.accounting;
 process.stdout.write(
-  `token radar: ${snapshot.protocols.length} protocols, ${snapshot.watchlist.length} on the watchlist, ${board.rows.length} rows scored (${board.coverage.farmable} farmable, ${board.coverage.notFarmable} not farmable)\n` +
-    `token radar: fit log10(mcap) = ${fit.intercept.toFixed(3)} + ${fit.slope.toFixed(3)} x log10(tvl) + category offset, R2 ${fit.r2.toFixed(3)} (global alone ${fit.r2Global.toFixed(3)}), n ${fit.n}\n` +
-    `token radar: held out ${held.nTest} comps in ${held.folds} folds: median |log10 err| ${held.medianAbsLog10Err.toFixed(3)}, within 2x ${(held.within2x * 100).toFixed(0)}%, 90% coverage ${(held.coverage90 * 100).toFixed(0)}%\n` +
-    `token radar: wrote ${join(out, 'board.json')}, ${join(out, 'data.js')}, ${join(out, 'dashboard')}, ${join(out, 'screenshots')} (${shots.length} images) and ${join(out, 'dossier.json')}\n`,
+  `token radar v4: ${snapshot.protocols.length} protocols, ${snapshot.watchlist.length} on the watchlist, ${board.rows.length} rows ranked (${board.coverage.farm} farm, ${board.coverage.marginal} marginal, ${board.coverage.skip} skip)\n` +
+    `token radar v4: size curve log10(mcap) = ${fit.intercept.toFixed(3)} + ${fit.slope.toFixed(3)} x log10(tvl), R2 ${fit.r2.toFixed(3)}, n ${fit.n}, resid sd ${fit.residSd.toFixed(3)}\n` +
+    `token radar v4: held-out miss walk-forward x${sizeTerm.wfMiss.toFixed(2)} vs flat x${flatTerm.wfMiss.toFixed(2)} (leave-one-out x${sizeTerm.looMiss.toFixed(2)} vs x${flatTerm.looMiss.toFixed(2)})\n` +
+    `token radar v4: odds Brier leave-one-out ${ageTerm.looBrier.toFixed(3)} vs base ${baseTerm.looBrier.toFixed(3)} (walk-forward ${ageTerm.wfBrier.toFixed(3)} vs ${baseTerm.wfBrier.toFixed(3)}); range P25-P75 holds ${ev.range.looP25P75}% LOO, ${ev.range.wfP25P75}% WF\n` +
+    `token radar v4: ledger ${a.rankedWatchlist} watchlist + ${a.rankedEarly} early + ${a.rankedOffList} off-list + ${a.tokenPriced} priced + ${a.tokenNoCap} no-cap + ${a.outBridge} bridge + ${a.outLiquid} liquid + ${a.outExchange} exchange + ${a.outVersioned} versioned = ${a.total}; checksum ${board.model.integrity.checksum}; total implied $${board.model.integrity.totalImpliedUsd.toLocaleString('en-US')}\n` +
+    `token radar v4: wrote ${join(out, 'board.json')}, ${join(out, 'data.js')}, ${join(out, 'dashboard')}, ${join(out, 'screenshots')} (${shots.length} images) and ${join(out, 'dossier.json')}\n`,
 );
