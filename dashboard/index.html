@@ -3,20 +3,30 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fleet Forge — Token Launch Radar</title>
+<title>Northlight — Token Launch Radar</title>
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
-<header class="top">
-  <div class="brand">
-    <h1>Fleet Forge</h1>
-    <p class="tag">Token launch radar — which pre-token protocol is worth farming next, and what to do about it.</p>
+<header class="masthead">
+  <div class="masthead-in">
+    <div>
+      <p class="kicker">TOKEN LAUNCH RADAR &middot; DEFI DATA AS OF <span id="asof">—</span></p>
+      <h1>Northlight</h1>
+      <p class="sub">Which protocols still record no token — ranked by what their launch would be worth, with a costed plan to farm each one.</p>
+    </div>
+    <div class="masthead-side">
+      <p class="bignum"><span id="totalImplied">—</span></p>
+      <p class="bignum-label">total implied value across the board</p>
+    </div>
   </div>
-  <div class="stats" id="stats"></div>
 </header>
 
+<section class="strip" id="strip" aria-label="Integrity strip"></section>
+
 <main>
-  <section class="controls" aria-label="Board controls">
+  <section class="panel" id="detail" hidden></section>
+
+  <section class="controls">
     <input id="q" type="search" placeholder="Search name or slug…" aria-label="Search">
     <select id="verdict" aria-label="Verdict filter">
       <option value="">All verdicts</option>
@@ -24,51 +34,34 @@
       <option value="marginal">Marginal</option>
       <option value="skip">Skip</option>
     </select>
-    <select id="category" aria-label="Category filter">
+    <select id="cat" aria-label="Category filter">
       <option value="">All categories</option>
     </select>
-    <select id="chain" aria-label="Chain filter">
-      <option value="">All chains</option>
-    </select>
-    <label class="check"><input id="watchonly" type="checkbox"> Watchlist only</label>
-    <select id="sort" aria-label="Sort board">
-      <option value="implied">Sort: implied value</option>
-      <option value="ev">Sort: value per hour</option>
-      <option value="tvl">Sort: TVL</option>
+    <select id="sort" aria-label="Sort">
+      <option value="rank">Sort: rank (implied value)</option>
       <option value="odds">Sort: launch odds</option>
-      <option value="name">Sort: name A–Z</option>
+      <option value="perhour">Sort: $/hour</option>
+      <option value="tvl">Sort: TVL</option>
     </select>
+    <span class="count" id="count"></span>
   </section>
 
-  <p class="count" id="count"></p>
-
-  <section class="board-wrap">
+  <section class="tablewrap">
     <table id="board">
       <thead>
-        <tr>
-          <th>#</th><th>Protocol</th><th>TVL</th><th>7d</th><th>Age</th>
-          <th>Implied value</th><th>Launch odds</th><th>Farm cost</th><th>Value / hour</th><th>Verdict</th>
-        </tr>
+        <tr><th>#</th><th>Protocol</th><th>Category</th><th>TVL</th><th>Implied value</th><th>80% range</th><th>Launch odds</th><th>Net $/hour</th><th>Verdict</th></tr>
       </thead>
       <tbody id="rows"></tbody>
     </table>
   </section>
 
-  <section class="detail" id="detail" hidden>
-    <button class="close" id="detail-close" type="button">Close detail ×</button>
-    <div id="detail-body"></div>
-  </section>
+  <details class="method" id="method">
+    <summary>How the radar works — model, held-out tests, odds, verdicts</summary>
+    <div id="methodBody"></div>
+  </details>
 
-  <section class="method" id="method">
-    <h2>How this radar works</h2>
-    <div id="method-body"></div>
-  </section>
+  <p class="foot">Implied value is this radar's own claim from the snapshot's figures — never a promise a token launches, or what it will be worth. A protocol "records no token" when its DefiLlama record names none; the record is not proof it has none. Gas figures are planning estimates, not quotes. Source: DefiLlama public API, frozen snapshot.</p>
 </main>
-
-<footer>
-  <p>Data: DefiLlama protocol snapshot, <span id="asof"></span>. “Records no token” means DefiLlama’s record names none — never proof a protocol has none. Implied values are this entry’s own claim, never make.fun’s, and never a prediction that a token will launch, or when. Farm-plan gas figures are planning estimates, not quotes.</p>
-  <p class="small">Fleet Forge R6 · built from the sealed snapshot by main.ts on every run · no network needed to read this page.</p>
-</footer>
 
 <script src="../data.js"></script>
 <script src="app.js"></script>
