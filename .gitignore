@@ -2,6 +2,5 @@ out/
 transcripts*.tar.gz
 makefun-bundle.tar.gz
 node_modules/
-parent-session-main.jsonl
-muse-usage.jsonl
-parent-session-r4.jsonl
+parent-session*.jsonl
+muse-usage*.jsonl
