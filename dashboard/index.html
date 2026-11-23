@@ -3,122 +3,100 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Signal v4 — Token Launch Radar</title>
+<title>Launch Radar — Signal v5</title>
 <link rel="stylesheet" href="app.css">
 </head>
 <body>
-<header>
-  <div>
-    <h1>Launch Radar <span class="sig">SIGNAL v4</span></h1>
-    <p class="sub">198 protocols that record no token, ranked by implied value = value if it launches &times; launch odds</p>
-  </div>
-  <div class="headmeta"><span id="snapline">—</span><span id="modelline">—</span></div>
-</header>
-
-<section class="kpis" id="kpis" aria-label="Key figures"></section>
-
-<p class="formula">Implied value = TVL &times; fitted multiple (the value if it launches) &times; token odds (from how long peers ran before recording one). Each coefficient is fitted on this snapshot and tested held-out.</p>
-
-<section class="accounting" aria-label="Protocol accounting">
-  <h2>Protocol accounting <span class="dim">all 758 snapshot protocols in exactly one group</span></h2>
-  <div class="abar" id="abar"></div>
-  <div class="alegend" id="alegend"></div>
-</section>
-
-<p class="integrity" id="integrity">—</p>
-
-<section class="evidence" id="evidence" aria-label="Out-of-sample evidence">
-  <h2>Out-of-sample evidence <span class="dim">a term is kept only if it lowers the held-out miss in both tests: leave-one-out and walk-forward (tokens listed earlier price those listed later)</span></h2>
-  <div class="evgrid">
-    <div class="evcard">
-      <h3>Value if it launches · typical miss, <span id="ev-comps">—</span> traded tokens</h3>
-      <table class="ev"><thead><tr><th>Term, added in order</th><th>Leave-one-out</th><th>Walk-forward</th><th></th></tr></thead><tbody id="ev-value"></tbody></table>
+<div id="app">
+  <header class="top">
+    <div>
+      <h1>Launch Radar <span class="tag">SIGNAL V5</span></h1>
+      <p class="sub" id="subtitle"></p>
     </div>
-    <div class="evcard">
-      <h3>Token odds · Brier score (share called right), <span id="ev-peers">—</span> peers</h3>
-      <table class="ev"><thead><tr><th>Term, added in order</th><th>Leave-one-out</th><th>Walk-forward</th><th></th></tr></thead><tbody id="ev-odds"></tbody></table>
+    <div class="meta" id="headmeta"></div>
+  </header>
+
+  <section id="spotlight" class="spot">
+    <h2>Farm this week <span class="dim" id="spot-note"></span></h2>
+    <div class="cards" id="cards"></div>
+  </section>
+
+  <p class="formula" id="formula"></p>
+  <div class="banner" id="farm-banner" hidden></div>
+
+  <section class="controls" id="controls">
+    <div class="row" id="chips">
+      <button data-verdict="all" class="chip on" id="chip-all"></button>
+      <button data-verdict="FARM" class="chip" id="chip-farm">Farm</button>
+      <button data-verdict="MARGINAL" class="chip" id="chip-marginal">Marginal</button>
+      <button data-verdict="SKIP" class="chip" id="chip-skip">Skip</button>
+      <select id="tier" aria-label="Tier">
+        <option value="all">All tiers</option>
+        <option value="watchlist">Watchlist</option>
+        <option value="early">Early (&lt;$50M)</option>
+        <option value="off-list">Off-list</option>
+      </select>
+      <button id="btn-watchlist" class="pill">Watchlist</button>
+      <button id="btn-early" class="pill">Early (&lt;$50M)</button>
+      <button id="btn-offlist" class="pill">Off-list</button>
+      <button id="btn-comps" class="pill">Priced comps (128)</button>
+      <label class="ctl">Deposit
+        <select id="deposit">
+          <option value="250">plan size, $250</option>
+          <option value="1000" selected>plan size, $1,000</option>
+          <option value="5000">plan size, $5,000</option>
+          <option value="10000">plan size, $10,000</option>
+        </select>
+      </label>
+      <label class="ctl">Drop share <b id="drop-val">7.0%</b>
+        <input type="range" id="drop" min="1" max="15" step="0.5" value="7">
+      </label>
     </div>
-    <div class="evcard">
-      <h3>Is the printed range honest?</h3>
-      <table class="ev"><thead><tr><th>Share of real caps</th><th>Leave-one-out</th><th>Walk-forward</th></tr></thead><tbody id="ev-range"></tbody></table>
-      <p class="evnote" id="ev-range-note">—</p>
+    <div class="row">
+      <label class="ctl">Horizon <b id="hor-val">12 wk</b>
+        <input type="range" id="horizon" min="4" max="52" step="1" value="12">
+      </label>
+      <input id="search" type="search" placeholder="Search name, chain, category" aria-label="Search">
+      <select id="category" aria-label="Category"><option value="all">All categories</option></select>
+      <select id="chain" aria-label="Chain"><option value="all">All chains</option></select>
+      <button id="reset" class="pill">Reset</button>
+      <button id="csv" class="pill">CSV</button>
+      <button id="json" class="pill">JSON</button>
+      <span class="sum" id="summary"></span>
     </div>
-  </div>
-  <div class="holdout">
-    <h3>Does it hold on tokens it never saw?</h3>
-    <p id="holdout-text">—</p>
-    <p class="fine">Reading it: 7-day growth and age help the value model on one test and hurt it on the other, so the value model leaves them out; both help decide which peers record a token, so they enter through the odds. The odds are the peers&rsquo; record (<span id="holdout-odds">—</span>), not a forecast: the page never says a token will launch.</p>
-  </div>
-</section>
+  </section>
 
+  <main id="board-view">
+    <table id="board">
+      <thead><tr>
+        <th class="num">#</th><th>Protocol</th><th class="num">TVL</th><th class="num">7D</th>
+        <th class="num">No-token age</th><th>Token odds</th><th class="num">Implied value · P25–P75</th>
+        <th class="num">Verdict · Net · $/hr</th>
+      </tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+  </main>
 
+  <main id="detail-view" hidden>
+    <button class="back" id="back">← Back to the board</button>
+    <div id="detail"></div>
+  </main>
 
-<section class="controls">
-  <div class="crow" id="verdict-filters">
-    <button data-vf="all" class="on">All 198</button>
-    <button data-vf="farm">Farm</button>
-    <button data-vf="marginal">Marginal</button>
-    <button data-vf="skip">Skip</button>
-  </div>
-  <select id="tier" aria-label="Tier"><option value="">All tiers</option><option value="1">Tier 1 · ranks 1–25</option><option value="2">Tier 2 · ranks 26–100</option><option value="3">Tier 3 · ranks 101–198</option></select>
-  <button id="wl-toggle" class="toggle" aria-pressed="false">Watchlist</button>
-  <button id="early-toggle" class="toggle" aria-pressed="false">Early (&lt;$50M)</button>
-  <button id="offlist-toggle" class="toggle" aria-pressed="false">Off-list</button>
-  <label class="dep">Deposit
-    <select id="deposit">
-      <option value="1000" selected>plan size, $1,000</option>
-      <option value="10000">$10,000</option>
-      <option value="pct002">0.02% of TVL</option>
-      <option value="pct1">1% of TVL</option>
-    </select>
-  </label>
-  <label class="slider">Drop share <b id="drop-val">7.0%</b>
-    <input id="drop" type="range" min="3.5" max="14" step="3.5" value="7">
-  </label>
-  <label class="slider">Horizon <b id="horizon-val">12 wk</b>
-    <input id="horizon" type="range" min="4" max="52" step="4" value="12">
-  </label>
-</section>
-<section class="controls">
-  <input id="q" type="search" placeholder="Search name, chain, category" autocomplete="off">
-  <select id="cat" aria-label="Category"><option value="">All categories</option></select>
-  <select id="chain" aria-label="Chain"><option value="">All chains</option></select>
-  <button id="reset">Reset</button>
-  <button id="csv">CSV</button>
-  <button id="json">JSON</button>
-  <span id="count" class="count"></span>
-</section>
+  <main id="comps-view" hidden>
+    <button class="back" id="back2">← Back to the board</button>
+    <h2>Priced comps <span class="dim">the 128 token-bearing protocols the size curve was fitted on</span></h2>
+    <p class="dim">Real cap against fitted cap, checkable row by row. Miss is real cap divided by fitted cap: above 1 the market pays more than size alone predicts, below 1 it pays less.</p>
+    <table id="comps">
+      <thead><tr><th>Protocol</th><th class="num">TVL</th><th class="num">Real cap</th><th class="num">Fitted cap</th><th class="num">Miss</th></tr></thead>
+      <tbody id="comps-rows"></tbody>
+    </table>
+  </main>
 
-<main>
-  <table id="board">
-    <thead><tr>
-      <th data-sort="pos">#</th><th data-sort="rank">Rank · range</th><th data-sort="name">Protocol</th>
-      <th data-sort="tvl_usd">TVL</th><th data-sort="change_7d">7D</th><th data-sort="age_days">No-token age</th>
-      <th data-sort="launch_odds">Token odds</th><th data-sort="fitted_value_usd">If it launches</th>
-      <th data-sort="implied_value_usd">Implied value · P25–P75</th>
-      <th data-sort="net_fees_usd">Verdict · net of fees</th><th data-sort="net_per_hour_usd">Net / hour</th>
-    </tr></thead>
-    <tbody id="rows"></tbody>
-  </table>
-  <p class="empty" id="empty" hidden>No protocols match this filter.</p>
-</main>
-
-<section class="method">
-  <h2>How this radar works</h2>
-  <p><b>1. Fitted size curve, not a fixed multiple.</b> For the <span id="m-fit-n">—</span> token-bearing protocols with a market cap, log<sub>10</sub>(market cap) is regressed on log<sub>10</sub>(TVL): <code id="m-fit-eq">—</code>. The category effect, 7-day growth, age and chain count were each tested against this curve and rejected — see the evidence tables above.</p>
-  <p><b>2. Launch odds from the peers&rsquo; record.</b> The odds are the share of protocols this old that already record a token, smoothed toward the overall rate: <span id="m-odds">—</span>. Age unknown uses the overall rate. This is the peers&rsquo; record, not a promise a token will launch.</p>
-  <p><b>3. Costed farm verdicts, re-priced by your scenario.</b> Farmer gross is the implied value &times; the drop share (default 7%) split among 2,000 farmers. Net of fees subtracts 3 gas sessions (by chain) and the opportunity cost of the deposit plan (4.5% a year over the horizon). Verdict: <b>farm</b> when net is &ge;$25 an hour, <b>marginal</b> when net is &ge;$0, <b>skip</b> below $0. Move the drop-share or horizon slider and every row re-prices in place; the board verdict is the default scenario (7% drop, $1,000 deposit, 12 weeks).</p>
-  <p class="fine">Figures are this entry&rsquo;s valuation model applied to a frozen snapshot, not a launch forecast and not financial advice. &ldquo;Records no token&rdquo; means the snapshot records none — a protocol may still have a token its DefiLlama record does not carry. Verify eligibility on the protocol&rsquo;s own pages before farming.</p>
-</section>
-
-<aside id="detail" hidden>
-  <button id="close" aria-label="Close detail">&times;</button>
-  <div id="detail-body"></div>
-</aside>
-
-<footer>
-  <p>Signal v4 &middot; fitted size curve &times; empirical launch odds, both tested held-out &middot; <span id="foot">—</span></p>
-</footer>
+  <section id="how" class="how">
+    <h2>How it works</h2>
+    <div id="how-body"></div>
+  </section>
+</div>
 <script src="../data.js"></script>
 <script src="app.js"></script>
 </body>
